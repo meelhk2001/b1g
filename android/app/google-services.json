@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "348519163598",
+    "project_id": "saranfarms-m",
+    "storage_bucket": "saranfarms-m.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:348519163598:android:879e550388de36877a929f",
+        "android_client_info": {
+          "package_name": "com.example.saranfarms"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "348519163598-pmr2b13tlgp29ovf1mfgi1c9jsbhe4q0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8ONmfXpnTdcqMiR6zfl6hZMlAgBQ8j6k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "348519163598-pmr2b13tlgp29ovf1mfgi1c9jsbhe4q0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
