@@ -44,8 +44,9 @@ class _ButtonMainState extends State<ButtonMain> {
             //width: MediaQuery.of(context).size.width * 0.10,
             height: double.maxFinite,
             color: widget.hover ? Colors.green : Colors.white),
-        onTap: () {
+        onTap: () async {
           if (widget.code == 0) {
+            await Provider.of<MainProvider>(context, listen: false).userdata();
             if (auth) {
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
@@ -53,18 +54,31 @@ class _ButtonMainState extends State<ButtonMain> {
                   builder: (context) => UserScreen(),
                 ),
               );
+            } else if (Provider.of<MainProvider>(context, listen: false)
+                .tryauth) {
+              await Provider.of<MainProvider>(context, listen: false)
+                  .userdata()
+                  .then((value) {
+                if (value != null) {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      fullscreenDialog: true,
+                      builder: (context) => UserScreen()));
+                }
+              });
             } else {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  fullscreenDialog: true,
-                  builder: (context) => const AuthScreen(),
-                ),
-              );
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                fullscreenDialog: true,
+                builder: (context) => const AuthScreen(),
+              ));
             }
           } else if (widget.code == 1) {
             Navigator.of(context).pushReplacement(MaterialPageRoute(
               fullscreenDialog: true,
-              builder: (context) => const RetailScreen(),
+              builder: (context) =>
+                  Provider.of<MainProvider>(context, listen: false).type == 1
+                      ? RetailScreen('retailprice')
+                      : Home(Provider.of<MainProvider>(context, listen: false)
+                          .auth),
             ));
           } else if (widget.code == 2) {
             Navigator.of(context).push(MaterialPageRoute(
@@ -83,7 +97,7 @@ class _ButtonMainState extends State<ButtonMain> {
       },
       onExit: (details) {
         setState(() {
-          widget.hover = widget.code < 1 ? true : false;
+          widget.hover = widget.code == 1 ? true : false;
         });
       },
       cursor: SystemMouseCursors.click,

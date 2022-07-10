@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:saranfarms/providers/mainprovider.dart';
 import 'package:saranfarms/screens/homescreen.dart';
 import 'package:saranfarms/widgets/buttonmain.dart';
 
@@ -20,15 +22,18 @@ class Appbar extends StatelessWidget {
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
                 //settings: RouteSettings(),
                 fullscreenDialog: true,
-                builder: (context) => const Home(),
+                builder: (context) => Home(
+                    Provider.of<MainProvider>(context, listen: false).auth),
               )),
               child: Image.asset('assets/bog.png'),
             ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.25,
-            ),
-            ButtonMain('Your Profile', true, 0),
-            ButtonMain('Price Index', false, 1),
+            Navigator.defaultRouteName == '/]'
+                ? Icon(Icons.search)
+                : SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.25,
+                  ),
+            ButtonMain('Price Index', true, 1),
+            ButtonMain('Your Profile', false, 0),
             ButtonMain('Admin Page', false, 2)
           ],
         ),

@@ -1,12 +1,18 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:saranfarms/providers/authprovider.dart';
 import 'package:saranfarms/providers/mainprovider.dart';
+import 'package:saranfarms/screens/authscreen.dart';
+import 'package:saranfarms/screens/userscreen.dart';
 import 'package:saranfarms/widgets/appbar.dart';
 import 'package:saranfarms/widgets/slider.dart';
 
 class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+  bool authstate;
+  Home(this.authstate, {Key? key}) : super(key: key);
 
   @override
   State<Home> createState() => _HomeState();
@@ -15,7 +21,8 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   @override
   void initState() {
-    Provider.of<MainProvider>(context, listen: false).userdata();
+    //Provider.of<MainProvider>(context, listen: false).userdata();
+    setState(() {});
     // TODO: implement initState
     super.initState();
   }
@@ -24,6 +31,7 @@ class _HomeState extends State<Home> {
     final hgt = MediaQuery.of(context).size.height;
     final wdth = MediaQuery.of(context).size.width;
     // bool home = Provider.of<MainProvider>(context, listen: true).home;
+    bool _auth = widget.authstate;
 
     return Scaffold(
       appBar:
@@ -53,22 +61,53 @@ class _HomeState extends State<Home> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     FlatButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        if (_auth) {
+                          Navigator.of(context)
+                              .pushReplacement(MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (context) => UserScreen(),
+                          ));
+                        } else {
+                          Provider.of<AuthProvider>(context, listen: false)
+                              .sgnin(context);
+                        }
+                      },
                       color: Colors.green,
-                      child: const Text(
-                        'Sign In',
-                        style: TextStyle(color: Colors.white, letterSpacing: 1),
+                      child: Text(
+                        _auth ? 'See Profile' : 'Sign In',
+                        style: const TextStyle(
+                            color: Colors.white, letterSpacing: 1),
                       ),
                     ),
                     SizedBox(
                       width: wdth * 0.01,
                     ),
                     FlatButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        if (_auth) {
+                          setState(() {
+                            Provider.of<MainProvider>(context, listen: false)
+                                .signout();
+                            Navigator.of(context)
+                                .pushReplacement(MaterialPageRoute(
+                              fullscreenDialog: true,
+                              builder: (context) => Home(false),
+                            ));
+                          });
+                        } else {
+                          Navigator.of(context)
+                              .pushReplacement(MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (context) => const AuthScreen(),
+                          ));
+                        }
+                      },
                       color: Colors.green,
-                      child: const Text(
-                        'Sign Up',
-                        style: TextStyle(color: Colors.white, letterSpacing: 1),
+                      child: Text(
+                        _auth ? 'Sign Out' : 'Sign Up',
+                        style: const TextStyle(
+                            color: Colors.white, letterSpacing: 1),
                       ),
                     )
                   ],
