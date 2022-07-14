@@ -23,6 +23,10 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   //get signInWithGoogle => null;
   String typetext = 'I am a...';
+  String? name, uid, email, businuess;
+  String? imageUrl;
+  int type = 0;
+  int? mobile;
   @override
   Widget build(BuildContext context) {
     //Firebase.initializeApp();
@@ -31,10 +35,6 @@ class _AuthScreenState extends State<AuthScreen> {
     // final GoogleSignIn googleSignIn = GoogleSignIn();
     final FirebaseAuth _auth = FirebaseAuth.instance;
 
-    String? name, uid, email, businuess;
-    String? imageUrl;
-    int type = 0;
-    int? mobile = 91;
     final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
     Future<User?> signInWithGoogle() async {
@@ -78,7 +78,7 @@ class _AuthScreenState extends State<AuthScreen> {
             : SingleChildScrollView(
                 child: Stack(
                   children: [
-                    const ImageSlider(),
+                    const WidgetSlider(),
                     Row(
                       children: [
                         Form(
@@ -115,6 +115,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                   height: hgt * 0.05,
                                 ),
                                 TextFormField(
+                                  initialValue: name,
                                   decoration: const InputDecoration(
                                     hintText: 'Enter your Name*',
                                     hintStyle: TextStyle(color: Colors.white),
@@ -143,6 +144,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                   height: hgt * 0.03,
                                 ),
                                 TextFormField(
+                                  initialValue: businuess,
                                   cursorColor: Colors.white,
                                   style: const TextStyle(color: Colors.white),
                                   decoration: const InputDecoration(
@@ -172,6 +174,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                   height: hgt * 0.03,
                                 ),
                                 TextFormField(
+                                  initialValue: email,
                                   cursorColor: Colors.white,
                                   style: const TextStyle(color: Colors.white),
                                   decoration: const InputDecoration(
@@ -202,6 +205,8 @@ class _AuthScreenState extends State<AuthScreen> {
                                   height: hgt * 0.03,
                                 ),
                                 TextFormField(
+                                  initialValue:
+                                      mobile == null ? '' : mobile.toString(),
                                   cursorColor: Colors.white,
                                   style: const TextStyle(color: Colors.white),
                                   decoration: const InputDecoration(
@@ -269,6 +274,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                               'I am a Manufacturer') {
                                             type = 4;
                                           }
+                                          setState(() {});
                                         }
                                         //value: typetext,
                                         ),
@@ -276,7 +282,12 @@ class _AuthScreenState extends State<AuthScreen> {
                                       onPressed: () {
                                         // Validate will return true if the form is valid, or false if
                                         // the form is invalid.
-
+                                        if (typetext == 'I am a...') {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(const SnackBar(
+                                                  content: Text(
+                                                      'Choose Your Bussinuess type')));
+                                        }
                                         if (_formKey.currentState!.validate() &&
                                             typetext != 'I am a...') {
                                           try {

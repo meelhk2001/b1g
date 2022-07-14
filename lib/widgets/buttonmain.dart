@@ -83,7 +83,7 @@ class _ButtonMainState extends State<ButtonMain> {
           } else if (widget.code == 2) {
             Navigator.of(context).push(MaterialPageRoute(
               fullscreenDialog: true,
-              builder: (context) => const Admin(),
+              builder: (context) => Admin(),
             ));
           }
           authscreen;

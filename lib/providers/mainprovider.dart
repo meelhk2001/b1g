@@ -183,4 +183,23 @@ class MainProvider with ChangeNotifier {
           .delete();
     } catch (_) {}
   }
+
+  Future<void> deleteuser(String docid) async {
+    try {
+      FirebaseFirestore.instance.collection('loginrequest').doc(docid).delete();
+    } catch (_) {
+      //
+    }
+  }
+
+  Future<void> approveuser(String docid) async {
+    try {
+      FirebaseFirestore.instance
+          .collection('loginrequest')
+          .doc(docid)
+          .update({'approve': true});
+    } catch (_) {
+      //
+    }
+  }
 }

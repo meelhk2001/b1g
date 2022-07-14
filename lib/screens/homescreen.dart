@@ -39,7 +39,7 @@ class _HomeState extends State<Home> {
       body: SingleChildScrollView(
           child: Column(
         children: [
-          const ImageSlider(),
+          const WidgetSlider(),
           Container(
             width: wdth,
             height: hgt * 0.6,

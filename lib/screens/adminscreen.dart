@@ -1,11 +1,20 @@
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:saranfarms/providers/mainprovider.dart';
+import 'package:saranfarms/providers/generalprovider.dart';
+import 'package:saranfarms/screens/adminscreens/customerrequest.dart';
 
 class Admin extends StatefulWidget {
+  // static State<StatefulWidget>? of(BuildContext context) =>
+  //     context.findAncestorStateOfType<_AdminState>();
+  //(const TypeMatcher<_AdminState>());
   const Admin({Key? key}) : super(key: key);
 
   @override
@@ -14,6 +23,7 @@ class Admin extends StatefulWidget {
 
 class _AdminState extends State<Admin> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  double progress = 0;
   @override
   void initState() {
     _tabController = TabController(vsync: this, length: 4);
@@ -51,12 +61,12 @@ class _AdminState extends State<Admin> with SingleTickerProviderStateMixin {
             controller: _tabController,
             tabs: const [
               Tab(
-                icon: Icon(FontAwesomeIcons.cartPlus),
-                text: 'Marts and Retailors',
+                icon: Icon(FontAwesomeIcons.home),
+                text: 'Home Page',
               ),
               Tab(
-                icon: Icon(Icons.agriculture),
-                text: 'Farmers and Producers',
+                icon: Icon(FontAwesomeIcons.universalAccess),
+                text: 'Custmer Requests',
               ),
               Tab(
                 icon: Icon(Icons.import_export),
@@ -71,151 +81,76 @@ class _AdminState extends State<Admin> with SingleTickerProviderStateMixin {
       body: TabBarView(
         controller: _tabController,
         children: [
-          SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                TextButton.icon(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              TextButton.icon(
                   icon: const Icon(FontAwesomeIcons.plus),
                   label: Text(
-                    _tabController.index == 0
-                        ? 'Why add a product'
-                        : 'Add a Product',
+                    'upload an image for Slide',
                     style: GoogleFonts.lato(fontSize: 20, color: Colors.black),
                   ),
-                  onPressed: () {
-                    showDialog<String>(
-                      context: context,
-                      builder: (BuildContext context) => AlertDialog(
-                        backgroundColor: Colors.white,
-                        title: const Text('Enter The details of the  product'),
-                        content: Form(
-                          key: _formKey,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              TextFormField(
-                                onChanged: (value) => name = value,
-                                decoration: const InputDecoration(
-                                  hintText: 'Name or title*',
+                  onPressed: () async {
+                    await Provider.of<GeneralProvider>(context, listen: false)
+                        .uploadsliderimage(context,
+                            DateTime.now().millisecondsSinceEpoch.toString());
+                  }),
+              StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: FirebaseFirestore.instance
+                    .collection('slidingimages')
+                    .snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                        snapshot) {
+                  return Flexible(
+                    child: ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount:
+                            snapshot.connectionState == ConnectionState.active
+                                ? snapshot.data!.docs.length
+                                : 0,
+                        itemBuilder: (context, index) => Column(
+                              children: [
+                                SizedBox(
+                                  height: hgt * 0.7,
+                                  child: CachedNetworkImage(
+                                    imageUrl: snapshot.data!.docs[index]
+                                        ['link'],
+                                    fit: BoxFit.contain,
+                                  ),
                                 ),
-                                validator: (String? value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter some text';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              SizedBox(
-                                height: hgt * 0.03,
-                              ),
-                              TextFormField(
-                                decoration: const InputDecoration(
-                                  hintText: 'Description*',
+                                ElevatedButton(
+                                    onPressed: () {
+                                      Provider.of<GeneralProvider>(context,
+                                              listen: false)
+                                          .deleteslidingimage(
+                                              snapshot.data!.docs[index]['id'],
+                                              snapshot.data!.docs[index]
+                                                  ['name']);
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: const [
+                                        Text('Delete'),
+                                      ],
+                                    )),
+                                const Divider(
+                                  thickness: 1,
+                                  color: Colors.black,
                                 ),
-                                onChanged: (value) => description = value,
-                                validator: (String? value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter some text';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              SizedBox(
-                                height: hgt * 0.03,
-                              ),
-                              TextFormField(
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(
-                                      RegExp('[0-9.,]+')),
-                                ],
-                                decoration: const InputDecoration(
-                                  hintText: 'Price in INR*',
-                                ),
-                                onChanged: (value) {
-                                  double prc = double.tryParse(value) ?? 0;
-                                  price = prc;
-                                },
-                                validator: (String? value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter valid number';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              SizedBox(
-                                height: hgt * 0.03,
-                              ),
-                              TextFormField(
-                                decoration: const InputDecoration(
-                                  hintText: 'Product image link*',
-                                ),
-                                onChanged: (value) => imageurl = value,
-                                validator: (String? value) {
-                                  if (value == null ||
-                                      value.isEmpty ||
-                                      !value.contains('.')) {
-                                    return 'Please enter a valid link';
-                                  } else {
-                                    imageurl = value;
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                _formKey.currentState?.reset();
-                                Navigator.pop(context, 'OK');
-                                showDialog<String>(
-                                    context: context,
-                                    builder: (BuildContext context) =>
-                                        AlertDialog(
-                                          backgroundColor: Colors.white,
-                                          title: const Text('Varify you Image'),
-                                          content: Stack(
-                                            children: [
-                                              const CircularProgressIndicator(),
-                                              Image.network(imageurl),
-                                            ],
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Provider.of<MainProvider>(
-                                                        context,
-                                                        listen: false)
-                                                    .adddata(
-                                                        name,
-                                                        description,
-                                                        price,
-                                                        imageurl,
-                                                        'retailprice');
-                                                Navigator.pop(context, 'OK');
-                                              },
-                                              child: const Icon(
-                                                  Icons.done_outlined),
-                                            )
-                                          ],
-                                        ));
-                              }
-                            },
-                            child: const Text('OK'),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                )
-              ],
-            ),
+                                SizedBox(
+                                  height: hgt * 0.1,
+                                )
+                              ],
+                            )),
+                  );
+                },
+              )
+            ],
           ),
-          const Center(),
+          CustomerRequest(),
           const Center(),
           const Center()
         ],
